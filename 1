@@ -1,0 +1,297 @@
+$(document).ready(function(){
+	//bind enter key to click button
+	$(document).keypress(function(e){
+    	if (e.which == 13){
+    		if($('#loginform').is(":visible")){
+    			$("#loginbutton").click();
+    		}
+        	else if($('#signupform').is(":visible")){
+        		$("#signupbutton").click();
+        	}
+    	}
+		
+	});
+
+	$('#signup').click(function(){
+		$('#loginform').slideUp();
+		$('#signupform').slideDown();
+		$('#myalert').slideUp();
+		$('#signform')[0].reset();
+	});
+
+	$('#login').click(function(){
+		$('#loginform').slideDown();
+		$('#signupform').slideUp();
+		$('#myalert').slideUp();
+		$('#logform')[0].reset();
+	});
+
+	$(document).on('click', '#signupbutton', function(){
+		if($('#susername').val()!='' && $('#spassword').val()!=''){
+			$('#signtext').text('Signing up...');
+			$('#myalert').slideUp();
+			var signform = $('#signform').serialize();
+			$.ajax({
+				method: 'POST',
+				url: 'signup.php',
+				data: signform,
+				success:function(data){
+					setTimeout(function(){
+					$('#myalert').slideDown();
+					$('#alerttext').html(data);
+					$('#signtext').text('Sign up');
+					$('#signform')[0].reset();
+					}, 2000);
+				} 
+			});
+		}
+		else{
+			alert('Please input both fields to Sign Up');
+		}
+	});
+
+	$(document).on('click', '#loginbutton', function(){
+		if($('#username').val()!='' && $('#password').val()!=''){
+			$('#logtext').text('Logging in...');
+			$('#myalert').slideUp();
+			var logform = $('#logform').serialize();
+			setTimeout(function(){
+				$.ajax({
+					method: 'POST',
+					url: 'login.php',
+					data: logform,
+					success:function(data){
+						if(data==''){
+							$('#myalert').slideDown();
+							$('#alerttext').text('Login Successful. User Verified!');
+							$('#logtext').text('Login');
+							$('#logform')[0].reset();
+							setTimeout(function(){
+								location.reload();
+							}, 2000);
+						}
+						else{
+							$('#myalert').slideDown();
+							$('#alerttext').html(data);
+							$('#logtext').text('Login');
+							$('#logform')[0].reset();
+						}
+					} 
+				});
+			}, 2000);
+		}
+		else{
+			alert('Please input both fields to Login');
+		}
+	});
+});
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Diseño bootstrap</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+</head>
+<?php include('session.php'); ?>
+<?php include('header.php'); ?>
+<body>
+<div class="container">
+	<div style="height:50px;">
+	</div>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+           <h2>Bienvenido, <?php echo $user; ?>!</h2>
+           <a href="logout.php" class="btn btn-danger"><span class="glyphicon glyphicon-log-out"></span> Salir</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<?php
+	session_start();
+	if(isset($_SESSION['user'])){
+		header('location:home.php');
+	}
+?>
+
+<?php include('header.php'); ?>
+<body>
+<div class="container">
+	<div style="height:50px;">
+	</div>
+    <div class="row" id="loginform">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="login-panel panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-lock"></span> Login
+                    	<span class="pull-right"><span class="glyphicon glyphicon-pencil"></span> <a style="text-decoration:none; cursor:pointer; color:white;" id="signup">Sign up</a></span>
+                    </h3>
+                </div>
+            	<div class="panel-body">
+                	<form role="form" id="logform">
+                    	<fieldset>
+                        	<div class="form-group">
+                            	<input class="form-control" placeholder="Username" name="username" id="username" type="text" autofocus>
+                        	</div>
+                        	<div class="form-group">
+                            	<input class="form-control" placeholder="Password" name="password" id="password" type="password">
+                        	</div>
+                        	<button type="button" id="loginbutton" class="btn btn-lg btn-primary btn-block"><span class="glyphicon glyphicon-log-in"></span> <span id="logtext">Login</span></button>
+                    	</fieldset>
+                	</form>
+            	</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="signupform" style="display:none;">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="login-panel panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-pencil"></span> Sign Up
+                    	<span class="pull-right"><span class="glyphicon glyphicon-log-in"></span> <a style="text-decoration:none; cursor:pointer; color:white;" id="login">Login</a></span>
+                    </h3>
+                </div>
+            	<div class="panel-body">
+                	<form role="form" id="signform">
+                    	<fieldset>
+                        	<div class="form-group">
+                            	<input class="form-control" placeholder="Username" name="susername" id="susername" type="text" autofocus>
+                        	</div>
+                        	<div class="form-group">
+                            	<input class="form-control" placeholder="Password" name="spassword" id="spassword" type="password">
+                        	</div>
+                        	<button type="button" id="signupbutton" class="btn btn-lg btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> <span id="signtext">Sign Up</span></button>
+                    	</fieldset>
+                	</form>
+            	</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myalert" style="display:none;">
+    	<div class="col-md-4 col-md-offset-4">
+    		<div class="alert alert-info">
+    			<center><span id="alerttext"></span></center>
+    		</div>
+   	 	</div>
+    </div>
+</div>
+<script src="custom.js"></script>
+</body>
+</html>
+<?php 
+	include('conn.php');  // Incluyendo a la base de datos
+	session_start();
+	if(isset($_POST['username'])){
+		$username=$_POST['username'];
+		$password=md5($_POST['password']);
+
+		$query=$conn->query("select * from user where username='$username' and password='$password'");
+
+		if ($query->num_rows>0){
+			$row=$query->fetch_array();
+			$_SESSION['user']=$row['userid']; 
+		}
+		else{
+			?>
+  				<span>Error de inicio de sesion. Usuario no registrado.</span>
+  			<?php 
+		}
+	}
+?>
+
+<!-- DESTRUCCION DE La session -->
+<?php
+	session_start();
+	session_destroy();
+	header('location:index.php');
+?>
+
+<!-- detecta que usuario a iniciado session -->
+<?php
+	session_start();
+	include('conn.php');
+
+	$query=$conn->query("select * from user where userid='".$_SESSION['user']."'");
+	$row=$query->fetch_array();
+
+	$user=$row['username'];
+?>
+
+<!-- registro de usario-->
+<?php
+	include('conn.php');
+	
+	if(isset($_POST['susername'])){
+		$username=$_POST['susername'];
+		$password=$_POST['spassword'];
+
+		$query=$conn->query("select * from user where username='$username'");
+
+		if ($query->num_rows>0){
+			?>
+  				<span>El nombre de usuario ya existe</span>
+  			<?php 
+		}
+
+		elseif (!preg_match("/^[a-zA-Z0-9_]*$/",$username)){
+			?>
+  				<span style="font-size:11px;">Nombre de usuario no válido. No se permiten espacios ni caracteres especiales.</span>
+  			<?php 
+		}
+		elseif (!preg_match("/^[a-zA-Z0-9_]*$/",$password)){
+			?>
+  				<span style="font-size:11px;">Contraseña invalida. No se permiten espacios ni caracteres especiales.</span>
+  			<?php 
+		}
+		else{
+			$mpassword=md5($password);
+			$conn->query("insert into user (username, password) values ('$username', '$mpassword')");
+			?>
+  				<span>Registro.</span>
+  			<?php 
+		}
+	}
+?>
+<?php
+	Class Model {
+
+		private $server = "localhost";
+		private $username = "root";
+		private $password;
+		private $db = "db_login";
+		private $conn;
+
+
+		// llamada a la base de datos 
+		public function __construct(){
+			try {
+
+				//llamar a conn
+				
+				$this->conn = new mysqli($this->server,   $this->username,$this->password,$this->db);
+                if ($this=$server, $this=$username, $this=$password, $this=$db){   
+                    $conn;}
+                
+			} catch (Exception $e) {
+				echo "connection failed" . $e->getMessage();
+			}
+		}
+    }
+
+
+ 
+?>
+
+
+<!--
+// objeto
+$conn = new mysqli("localhost", "root", "", "db_login");
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+ -->
